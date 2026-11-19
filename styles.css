@@ -16,7 +16,10 @@ html{
 
 #containerPrincipal{
     display: flex;
-    justify-content: center;
+    flex-direction: column;
+    align-self: center;
+    margin-top: 50px;
+    width: 60%;
     height: 800px;
 }
 
@@ -35,12 +38,13 @@ html{
 
     & h1{
         color: white;
-        top:-30px;
+        top:-10px;
         position: relative;
     }
 
     & img{
         width: 1000px;
+        margin-right: 200px;
     }
 }
 
@@ -78,5 +82,15 @@ nav{
         width: 90px;
         font-size: 18px;
         height: 40px;
+        transition:0.3s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    & button:hover{
+        width: 95px;
+        height: 45px;
+        cursor: pointer;
     }
 }

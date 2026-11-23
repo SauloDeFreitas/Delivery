@@ -1,3 +1,4 @@
+const url = "http://127.0.0.1:3000/produtos"
 
 function criaTelaProdutos(){
     const containerPrincipal = document.getElementById('containerPrincipal')
@@ -45,6 +46,16 @@ function carregarHome(){
 
 function carregarAdmin(){
     removerConteudo()
+}
+
+
+
+async function carregarProdutos(){
+    const consulta = await fetch(url)
+    const resposta = await consulta.json()
+
+
+    console.log(resposta)
 }
 
 const botaoAdmin = document.getElementById('botaoAdmin')

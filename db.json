@@ -1,0 +1,10 @@
+{
+  "produtos": [
+    {
+      "id": "1",
+      "nome": "cookie chocolate",
+      "quantidade": "10",
+      "img": "url"
+    }
+  ]
+}

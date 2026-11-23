@@ -1,10 +1,5 @@
 const url = "http://127.0.0.1:3000/produtos"
 
-function criaTelaProdutos(){
-    const containerPrincipal = document.getElementById('containerPrincipal')
-
-}
-
 function removerConteudo(){
     const hero = document.getElementById('heroSection')
     const containerPrincipal = document.getElementById('containerPrincipal')
@@ -48,14 +43,28 @@ function carregarAdmin(){
     removerConteudo()
 }
 
+function criarCards(resposta){
+    const containerPrincipal = document.getElementById('containerPrincipal')
 
+    for(let i = 0; i < resposta.length; i++){
+        const card = document.createElement('div')
+        const tituloCard = document.createElement('h1')
+        const quantidadeCard = document.createElement('span')
+        const imgCard = document.createElement('img')
+        tituloCard.textContent = resposta[i].nome
+        quantidadeCard.textContent = resposta[i].quantidade
+        card.append(tituloCard, quantidadeCard)
+        containerPrincipal.appendChild(card)
+    }
+
+    
+}
 
 async function carregarProdutos(){
     const consulta = await fetch(url)
     const resposta = await consulta.json()
-
-
-    console.log(resposta)
+    
+    criarCards(resposta)
 }
 
 const botaoAdmin = document.getElementById('botaoAdmin')

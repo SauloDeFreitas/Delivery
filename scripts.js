@@ -9,6 +9,7 @@ function removerConteudo(){
 }
 
 function carregarHome(){    
+    removerConteudo()
     //carregando a hero section caso não haja uma sendo exibida
     const heroContainer = document.getElementById('heroSection')
     
@@ -48,12 +49,14 @@ function criarCards(resposta){
 
     for(let i = 0; i < resposta.length; i++){
         const card = document.createElement('div')
+        card.className = "cardProduto"
         const tituloCard = document.createElement('h1')
         const quantidadeCard = document.createElement('span')
         const imgCard = document.createElement('img')
         tituloCard.textContent = resposta[i].nome
-        quantidadeCard.textContent = resposta[i].quantidade
-        card.append(tituloCard, quantidadeCard)
+        quantidadeCard.textContent = "Quantidade: " +  resposta[i].quantidade
+        imgCard.src = resposta[i].img
+        card.append(tituloCard, imgCard,quantidadeCard)
         containerPrincipal.appendChild(card)
     }
 
@@ -63,7 +66,7 @@ function criarCards(resposta){
 async function carregarProdutos(){
     const consulta = await fetch(url)
     const resposta = await consulta.json()
-    
+
     criarCards(resposta)
 }
 

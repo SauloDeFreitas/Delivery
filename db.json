@@ -4,7 +4,7 @@
       "id": "1",
       "nome": "cookie chocolate",
       "quantidade": "10",
-      "img": "url"
+      "img": "https://res.cloudinary.com/yotvqe9o/image/upload/f_auto/q_auto/tradicional.jpg"
     }
   ]
 }

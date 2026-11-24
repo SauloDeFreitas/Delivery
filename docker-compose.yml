@@ -1,8 +1,0 @@
-services:
-  json-server:
-    image: slydeveloper/json-server
-    container_name: json-server
-    ports:
-      - "8000:8000"
-    volumes:
-      - "./db:/db"

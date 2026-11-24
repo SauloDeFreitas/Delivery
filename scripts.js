@@ -63,12 +63,22 @@ function criarCards(resposta){
         const tituloCard = document.createElement('h1')
         const quantidadeCard = document.createElement('span')
         const imgCard = document.createElement('img')
+        const botaoDeletar = document.createElement('button')
+        botaoDeletar.className = "botaoDeletar"
+        botaoDeletar.textContent = "Deletar"
+        botaoDeletar.addEventListener('click', async () => {
+            fetch(url + "/" + resposta[i].id, {
+                method: "DELETE"
+            })
+        })
 
         tituloCard.textContent = resposta[i].nome
         quantidadeCard.textContent = "Quantidade: " +  resposta[i].quantidade
-        imgCard.src = resposta[i].img
+        if(resposta[i].img){
+            imgCard.src = resposta[i].img
+        }
 
-        card.append(tituloCard, imgCard,quantidadeCard)
+        card.append(tituloCard, imgCard, quantidadeCard, botaoDeletar)
         containerPrincipal.appendChild(card)
     }
 
@@ -80,6 +90,33 @@ async function carregarProdutos(){
     const resposta = await consulta.json()
 
     criarCards(resposta)
+
+    const form = document.createElement('form')
+    const labelNome = document.createElement('label')
+    labelNome.textContent = "Nome"
+    const inputNome = document.createElement('input')
+    const labelQuant = document.createElement('label')
+    labelQuant.textContent = "Quantidade"
+    const inputQuant = document.createElement('input')
+    const botaoCadastrar = document.createElement('button')
+    botaoCadastrar.textContent = "cadastrar"
+    botaoCadastrar.addEventListener('click', async (e) => {
+        e.preventDefault()
+        const nome = inputNome.value
+        const quantidade = inputQuant.value
+        
+        fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ nome: nome, quantidade: quantidade })
+        })
+    })
+
+    form.append(labelNome,inputNome,labelQuant,inputQuant,botaoCadastrar)
+
+    const containerPrincipal = document.getElementById('containerPrincipal')
+    containerPrincipal.appendChild(form)
+
 }
 
 const botaoAdmin = document.getElementById('botaoAdmin')

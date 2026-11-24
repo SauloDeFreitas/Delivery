@@ -80,7 +80,15 @@ footer{
         border-radius: 20px;
 
     }
+
+    &:hover{
+        .botaoDeletar{
+            display: flex;
+        }
+    }
 }
+
+
 nav{
     height: 80px;
     background-color: var(--cor-destaque);

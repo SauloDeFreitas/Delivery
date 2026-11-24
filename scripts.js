@@ -10,6 +10,7 @@ function removerConteudo(){
 
 function carregarHome(){    
     removerConteudo()
+    voltarHeroSecion()
     //carregando a hero section caso não haja uma sendo exibida
     const heroContainer = document.getElementById('heroSection')
     
@@ -22,9 +23,6 @@ function carregarHome(){
         heroContainer.append(titulo, heroImg)
         heroContainer.style.backgroundColor = "#4A2E1B"
     }
-
-    
-
 
     //carregadno a seção de produtos e sobre da empresa
     const containerPrincipal = document.getElementById('containerPrincipal')
@@ -44,8 +42,20 @@ function carregarAdmin(){
     removerConteudo()
 }
 
+function removerHeroSection(){
+    //zerando o tamenho da hero section para fazer apenas o display do container principal
+    const hero = document.getElementById('heroSection')
+    hero.style.height = "0px"
+}
+
+function voltarHeroSecion(){
+    const hero = document.getElementById('heroSection')
+    hero.style.height = "100vh"
+}
+
 function criarCards(resposta){
     const containerPrincipal = document.getElementById('containerPrincipal')
+    removerHeroSection()
 
     for(let i = 0; i < resposta.length; i++){
         const card = document.createElement('div')
@@ -53,9 +63,11 @@ function criarCards(resposta){
         const tituloCard = document.createElement('h1')
         const quantidadeCard = document.createElement('span')
         const imgCard = document.createElement('img')
+
         tituloCard.textContent = resposta[i].nome
         quantidadeCard.textContent = "Quantidade: " +  resposta[i].quantidade
         imgCard.src = resposta[i].img
+
         card.append(tituloCard, imgCard,quantidadeCard)
         containerPrincipal.appendChild(card)
     }

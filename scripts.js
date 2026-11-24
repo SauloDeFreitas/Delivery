@@ -1,4 +1,4 @@
-const url = "http://127.0.0.1:3000/produtos"
+const url = "https://delivery-ik2i.onrender.com/produtos"
 
 function removerConteudo(){
     const hero = document.getElementById('heroSection')

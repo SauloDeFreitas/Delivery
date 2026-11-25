@@ -1,4 +1,5 @@
 const url = "https://delivery-ik2i.onrender.com/produtos"
+const urlImg = "https://res.cloudinary.com/yotvqe9o/image/upload/f_auto/q_auto/"
 
 function removerConteudo(){
     const hero = document.getElementById('heroSection')
@@ -29,9 +30,11 @@ function carregarHome(){
 
     if(containerPrincipal.children.length <= 0){
         const tituloSobre = document.createElement('h1')
+        tituloSobre.className = "tituloSobre"
         tituloSobre.textContent = "Sobre a empresa"
 
         const textoSobre = document.createElement('p')
+        textoSobre.className = "textoSobre"
         textoSobre.textContent = `Acreditamos que os melhores momentos da vida podem começar com um simples cookie! Nossa empresa nasceu da paixão por criar doces deliciosos, preparados com carinho e dedicação, transformando ingredientes selecionados em experiências únicas de sabor.Trabalhamos para oferecer cookies fresquinhos, com texturas irresistíveis e sabores especiais, sempre prezando pela qualidade e pelo cuidado em cada detalhe.Mais do que vender cookies, queremos proporcionar momentos de felicidade, adoçar o seu dia e tornar cada mordida uma experiência especial.`
 
         containerPrincipal.append(tituloSobre, textoSobre)
@@ -64,6 +67,24 @@ function criarCards(resposta){
         const quantidadeCard = document.createElement('span')
         const imgCard = document.createElement('img')
         const botaoDeletar = document.createElement('button')
+        const botaoEditar = document.createElement('button')
+        botaoEditar.className = "botaoEditar"
+        botaoEditar.textContent = "Editar"
+        botaoEditar.addEventListener('click', async () => {
+            const busca = await fetch(url)
+            const resposta = await busca.json()
+
+            const formEditar = document.createElement('form')
+            formEditar.className = "formEditar"
+            formEditar.innerHTML = `
+                <label for="nome">Nome</label>
+                <input type="text" name="nome" value="${resposta[i].nome}">
+                <label for="quantidade">Quantidade</label>
+                <input type="number" name="quantidade" value="${resposta[i].quantidade}">
+                <button type="submit" onclick="(e) => { e.preventDefault(); fetch(url + '/' + resposta[i].id, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ nome: inputNome.value, quantidade: inputQuant.value }) }) }">Salvar</button>
+            `
+            containerPrincipal.appendChild(formEditar)
+        })
         botaoDeletar.className = "botaoDeletar"
         botaoDeletar.textContent = "Deletar"
         botaoDeletar.addEventListener('click', async () => {
@@ -78,7 +99,7 @@ function criarCards(resposta){
             imgCard.src = resposta[i].img
         }
 
-        card.append(tituloCard, imgCard, quantidadeCard, botaoDeletar)
+        card.append(tituloCard, imgCard, quantidadeCard, botaoDeletar, botaoEditar)
         containerPrincipal.appendChild(card)
     }
 

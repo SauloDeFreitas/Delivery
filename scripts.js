@@ -60,6 +60,40 @@ function criarCards(resposta){
     const containerPrincipal = document.getElementById('containerPrincipal')
     removerHeroSection()
 
+    const form = document.createElement('form')
+    form.className = "formularioCadastro"
+    const tituloFormulario = document.createElement('h1')
+    tituloFormulario.textContent = "Cadastrar Produto"
+    const inputNome = document.createElement('input')
+    inputNome.type = "text"
+    inputNome.name = "nome"
+    inputNome.id = "inputNome"
+    inputNome.placeholder = "Nome do produto"
+    const inputQuantidade = document.createElement('input')
+    inputQuantidade.type = "number"
+    inputQuantidade.name = "quantidade"
+    inputQuantidade.id = "inputQuantidade"
+    inputQuantidade.placeholder = "Quantidade"
+    const botaoCadastrar = document.createElement('button')
+    botaoCadastrar.type = "submit"
+    botaoCadastrar.textContent = "Cadastrar"
+
+    form.append(tituloFormulario, inputNome, inputQuantidade, botaoCadastrar)
+
+    botaoCadastrar.addEventListener('click', async (event) => {
+        event.preventDefault()
+        const nome = document.getElementById('inputNome').value
+        const quantidade = document.getElementById('inputQuantidade').value
+
+        fetch(url, {
+            method: "POST",
+            headers: { contentType: "application/json" },
+            body: JSON.stringify({ nome: nome, quantidade: quantidade})
+        })
+    })
+
+    containerPrincipal.appendChild(form)
+
     for(let i = 0; i < resposta.length; i++){
         const card = document.createElement('div')
         card.className = "cardProduto"
@@ -70,21 +104,7 @@ function criarCards(resposta){
         const botaoEditar = document.createElement('button')
         botaoEditar.className = "botaoEditar"
         botaoEditar.textContent = "Editar"
-        botaoEditar.addEventListener('click', async () => {
-            const busca = await fetch(url)
-            const resposta = await busca.json()
-
-            const formEditar = document.createElement('form')
-            formEditar.className = "formEditar"
-            formEditar.innerHTML = `
-                <label for="nome">Nome</label>
-                <input type="text" name="nome" value="${resposta[i].nome}">
-                <label for="quantidade">Quantidade</label>
-                <input type="number" name="quantidade" value="${resposta[i].quantidade}">
-                <button type="submit" onclick="(e) => { e.preventDefault(); fetch(url + '/' + resposta[i].id, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ nome: inputNome.value, quantidade: inputQuant.value }) }) }">Salvar</button>
-            `
-            containerPrincipal.appendChild(formEditar)
-        })
+        
         botaoDeletar.className = "botaoDeletar"
         botaoDeletar.textContent = "Deletar"
         botaoDeletar.addEventListener('click', async () => {
@@ -98,8 +118,11 @@ function criarCards(resposta){
         if(resposta[i].img){
             imgCard.src = resposta[i].img
         }
+        const containerBotoes = document.createElement('div')
+        containerBotoes.className = "containerBotoes"
+        containerBotoes.append(botaoEditar, botaoDeletar)
 
-        card.append(tituloCard, imgCard, quantidadeCard, botaoDeletar, botaoEditar)
+        card.append(tituloCard, imgCard, quantidadeCard, containerBotoes)
         containerPrincipal.appendChild(card)
     }
 
@@ -111,33 +134,6 @@ async function carregarProdutos(){
     const resposta = await consulta.json()
 
     criarCards(resposta)
-
-    const form = document.createElement('form')
-    const labelNome = document.createElement('label')
-    labelNome.textContent = "Nome"
-    const inputNome = document.createElement('input')
-    const labelQuant = document.createElement('label')
-    labelQuant.textContent = "Quantidade"
-    const inputQuant = document.createElement('input')
-    const botaoCadastrar = document.createElement('button')
-    botaoCadastrar.textContent = "cadastrar"
-    botaoCadastrar.addEventListener('click', async (e) => {
-        e.preventDefault()
-        const nome = inputNome.value
-        const quantidade = inputQuant.value
-        
-        fetch(url, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ nome: nome, quantidade: quantidade })
-        })
-    })
-
-    form.append(labelNome,inputNome,labelQuant,inputQuant,botaoCadastrar)
-
-    const containerPrincipal = document.getElementById('containerPrincipal')
-    containerPrincipal.appendChild(form)
-
 }
 
 const botaoAdmin = document.getElementById('botaoAdmin')

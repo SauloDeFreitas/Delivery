@@ -1,5 +1,23 @@
 const url = "https://delivery-ik2i.onrender.com/produtos"
 const urlImg = "https://res.cloudinary.com/yotvqe9o/image/upload/f_auto/q_auto/"
+const urlLista = "https://res.cloudinary.com/yotvqe9o/image/list/cookies.json"
+
+let fotos = [
+    { nome: "Cookie de chocolate", id: "cookie_chocolate" },
+    { nome: "Cookie de baunilha", id: "cookie_baunilha" },
+    { nome: "Cookie red velvet", id: "cookie_redvelvet" }
+]
+
+async function carregarFotos(){
+    try {
+        const consulta = await fetch(urlLista)
+        const dados = await consulta.json()
+        if(dados.resources && dados.resources.length > 0){
+            fotos = dados.resources.map(f => ({ nome: f.public_id, id: f.public_id }))
+        }
+    } catch (erro) {
+    }
+}
 
 function removerConteudo(){
     const hero = document.getElementById('heroSection')
@@ -12,7 +30,6 @@ function removerConteudo(){
 function carregarHome(){    
     removerConteudo()
     voltarHeroSecion()
-    //carregando a hero section caso não haja uma sendo exibida
     const heroContainer = document.getElementById('heroSection')
     
     if(heroContainer.children.length <= 0){
@@ -25,7 +42,6 @@ function carregarHome(){
         heroContainer.style.backgroundColor = "#4A2E1B"
     }
 
-    //carregadno a seção de produtos e sobre da empresa
     const containerPrincipal = document.getElementById('containerPrincipal')
 
     if(containerPrincipal.children.length <= 0){
@@ -46,7 +62,6 @@ function carregarAdmin(){
 }
 
 function removerHeroSection(){
-    //zerando o tamenho da hero section para fazer apenas o display do container principal
     const hero = document.getElementById('heroSection')
     hero.style.height = "0px"
 }
@@ -74,11 +89,27 @@ function criarCards(resposta){
     inputQuantidade.name = "quantidade"
     inputQuantidade.id = "inputQuantidade"
     inputQuantidade.placeholder = "Quantidade"
+
+    const selectImg = document.createElement('select')
+    selectImg.id = "selectImg"
+
+    const optionPadrao = document.createElement('option')
+    optionPadrao.value = ""
+    optionPadrao.textContent = "Selecione uma foto"
+    selectImg.appendChild(optionPadrao)
+
+    fotos.forEach(foto => {
+        const option = document.createElement('option')
+        option.value = foto.id
+        option.textContent = foto.nome
+        selectImg.appendChild(option)
+    })
+
     const botaoCadastrar = document.createElement('button')
     botaoCadastrar.type = "submit"
     botaoCadastrar.textContent = "Cadastrar"
 
-    form.append(tituloFormulario, inputNome, inputQuantidade, botaoCadastrar)
+    form.append(tituloFormulario, inputNome, inputQuantidade, selectImg, botaoCadastrar)
 
     let idEmEdicao = null
 
@@ -86,12 +117,13 @@ function criarCards(resposta){
         event.preventDefault()
         const nome = document.getElementById('inputNome').value
         const quantidade = document.getElementById('inputQuantidade').value
+        const img = document.getElementById('selectImg').value
 
         if(idEmEdicao !== null){
             await fetch(url + "/" + idEmEdicao, {
                 method: "PATCH",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ nome: nome, quantidade: Number(quantidade) })
+                body: JSON.stringify({ nome: nome, quantidade: Number(quantidade), img: img })
             })
 
             idEmEdicao = null
@@ -100,8 +132,8 @@ function criarCards(resposta){
         } else {
             fetch(url, {
                 method: "POST",
-                headers: { contentType: "application/json" },
-                body: JSON.stringify({ nome: nome, quantidade: quantidade})
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ nome: nome, quantidade: Number(quantidade), img: img })
             })
         }
     })
@@ -123,6 +155,7 @@ function criarCards(resposta){
             idEmEdicao = resposta[i].id
             inputNome.value = resposta[i].nome
             inputQuantidade.value = resposta[i].quantidade
+            selectImg.value = resposta[i].img || ""
             tituloFormulario.textContent = "Editar Produto"
             botaoCadastrar.textContent = "Salvar"
             form.scrollIntoView({ behavior: "smooth" })
@@ -139,7 +172,9 @@ function criarCards(resposta){
         tituloCard.textContent = resposta[i].nome
         quantidadeCard.textContent = "Quantidade: " +  resposta[i].quantidade
         if(resposta[i].img){
-            imgCard.src = resposta[i].img
+            imgCard.src = resposta[i].img.startsWith("http")
+                ? resposta[i].img
+                : urlImg + resposta[i].img
         }
         const containerBotoes = document.createElement('div')
         containerBotoes.className = "containerBotoes"
@@ -153,6 +188,7 @@ function criarCards(resposta){
 }
 
 async function carregarProdutos(){
+    await carregarFotos()
     const consulta = await fetch(url)
     const resposta = await consulta.json()
 

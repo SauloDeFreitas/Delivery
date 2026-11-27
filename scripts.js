@@ -71,31 +71,52 @@ function voltarHeroSecion(){
     hero.style.height = "100vh"
 }
 
+function recarregarProdutos(){
+    removerConteudo()
+    carregarProdutos()
+}
+
+function criarCampo(texto, campo){
+    const grupo = document.createElement('div')
+    grupo.className = "campo"
+    const rotulo = document.createElement('label')
+    rotulo.htmlFor = campo.id
+    rotulo.textContent = texto
+    grupo.append(rotulo, campo)
+    return grupo
+}
+
 function criarCards(resposta){
     const containerPrincipal = document.getElementById('containerPrincipal')
     removerHeroSection()
 
+    const painel = document.createElement('div')
+    painel.className = "painelAdmin"
+
     const form = document.createElement('form')
     form.className = "formularioCadastro"
     const tituloFormulario = document.createElement('h1')
-    tituloFormulario.textContent = "Cadastrar Produto"
+    tituloFormulario.textContent = "Novo produto"
+
     const inputNome = document.createElement('input')
     inputNome.type = "text"
     inputNome.name = "nome"
     inputNome.id = "inputNome"
-    inputNome.placeholder = "Nome do produto"
+    inputNome.placeholder = "Ex.: Cookie de chocolate"
+
     const inputQuantidade = document.createElement('input')
     inputQuantidade.type = "number"
     inputQuantidade.name = "quantidade"
     inputQuantidade.id = "inputQuantidade"
-    inputQuantidade.placeholder = "Quantidade"
+    inputQuantidade.placeholder = "0"
+    inputQuantidade.min = "0"
 
     const selectImg = document.createElement('select')
     selectImg.id = "selectImg"
 
     const optionPadrao = document.createElement('option')
     optionPadrao.value = ""
-    optionPadrao.textContent = "Selecione uma foto"
+    optionPadrao.textContent = "Escolha uma foto"
     selectImg.appendChild(optionPadrao)
 
     fotos.forEach(foto => {
@@ -107,17 +128,38 @@ function criarCards(resposta){
 
     const botaoCadastrar = document.createElement('button')
     botaoCadastrar.type = "submit"
-    botaoCadastrar.textContent = "Cadastrar"
+    botaoCadastrar.className = "botaoCadastrar"
+    botaoCadastrar.textContent = "Cadastrar produto"
 
-    form.append(tituloFormulario, inputNome, inputQuantidade, selectImg, botaoCadastrar)
+    const botaoCancelar = document.createElement('button')
+    botaoCancelar.type = "button"
+    botaoCancelar.className = "botaoCancelar"
+    botaoCancelar.textContent = "Cancelar edição"
+    botaoCancelar.addEventListener('click', recarregarProdutos)
+
+    form.append(
+        tituloFormulario,
+        criarCampo("Nome", inputNome),
+        criarCampo("Quantidade", inputQuantidade),
+        criarCampo("Foto", selectImg),
+        botaoCadastrar,
+        botaoCancelar
+    )
 
     let idEmEdicao = null
 
     botaoCadastrar.addEventListener('click', async (event) => {
         event.preventDefault()
-        const nome = document.getElementById('inputNome').value
-        const quantidade = document.getElementById('inputQuantidade').value
-        const img = document.getElementById('selectImg').value
+        const nome = inputNome.value
+        const quantidade = inputQuantidade.value
+        const img = selectImg.value
+
+        if(nome.trim() === "" || quantidade === ""){
+            alert("Preencha o nome e a quantidade do produto.")
+            return
+        }
+
+        botaoCadastrar.disabled = true
 
         if(idEmEdicao !== null){
             await fetch(url + "/" + idEmEdicao, {
@@ -127,25 +169,42 @@ function criarCards(resposta){
             })
 
             idEmEdicao = null
-            removerConteudo()
-            carregarProdutos()
         } else {
-            fetch(url, {
+            await fetch(url, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ nome: nome, quantidade: Number(quantidade), img: img })
             })
         }
+
+        recarregarProdutos()
     })
 
-    containerPrincipal.appendChild(form)
+    const listaCards = document.createElement('div')
+    listaCards.className = "listaCards"
+
+    painel.append(form, listaCards)
+    containerPrincipal.appendChild(painel)
 
     for(let i = 0; i < resposta.length; i++){
         const card = document.createElement('div')
         card.className = "cardProduto"
         const tituloCard = document.createElement('h1')
         const quantidadeCard = document.createElement('span')
-        const imgCard = document.createElement('img')
+        quantidadeCard.className = "quantidadeCard"
+
+        let imgCard
+        if(resposta[i].img){
+            imgCard = document.createElement('img')
+            imgCard.src = resposta[i].img.startsWith("http")
+                ? resposta[i].img
+                : urlImg + resposta[i].img
+        } else {
+            imgCard = document.createElement('div')
+            imgCard.className = "semFoto"
+            imgCard.textContent = "sem foto"
+        }
+
         const botaoDeletar = document.createElement('button')
         const botaoEditar = document.createElement('button')
         botaoEditar.className = "botaoEditar"
@@ -156,35 +215,35 @@ function criarCards(resposta){
             inputNome.value = resposta[i].nome
             inputQuantidade.value = resposta[i].quantidade
             selectImg.value = resposta[i].img || ""
-            tituloFormulario.textContent = "Editar Produto"
-            botaoCadastrar.textContent = "Salvar"
-            form.scrollIntoView({ behavior: "smooth" })
+            tituloFormulario.textContent = "Editar produto"
+            botaoCadastrar.textContent = "Salvar alterações"
+            form.classList.add("editando")
+            form.scrollIntoView({ behavior: "smooth", block: "center" })
         })
         
         botaoDeletar.className = "botaoDeletar"
         botaoDeletar.textContent = "Deletar"
         botaoDeletar.addEventListener('click', async () => {
-            fetch(url + "/" + resposta[i].id, {
+            await fetch(url + "/" + resposta[i].id, {
                 method: "DELETE"
             })
+            recarregarProdutos()
         })
 
         tituloCard.textContent = resposta[i].nome
         quantidadeCard.textContent = "Quantidade: " +  resposta[i].quantidade
-        if(resposta[i].img){
-            imgCard.src = resposta[i].img.startsWith("http")
-                ? resposta[i].img
-                : urlImg + resposta[i].img
-        }
+
         const containerBotoes = document.createElement('div')
         containerBotoes.className = "containerBotoes"
         containerBotoes.append(botaoEditar, botaoDeletar)
 
-        card.append(tituloCard, imgCard, quantidadeCard, containerBotoes)
-        containerPrincipal.appendChild(card)
-    }
+        const corpoCard = document.createElement('div')
+        corpoCard.className = "corpoCard"
+        corpoCard.append(tituloCard, quantidadeCard, containerBotoes)
 
-    
+        card.append(imgCard, corpoCard)
+        listaCards.appendChild(card)
+    }
 }
 
 async function carregarProdutos(){

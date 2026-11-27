@@ -80,16 +80,30 @@ function criarCards(resposta){
 
     form.append(tituloFormulario, inputNome, inputQuantidade, botaoCadastrar)
 
+    let idEmEdicao = null
+
     botaoCadastrar.addEventListener('click', async (event) => {
         event.preventDefault()
         const nome = document.getElementById('inputNome').value
         const quantidade = document.getElementById('inputQuantidade').value
 
-        fetch(url, {
-            method: "POST",
-            headers: { contentType: "application/json" },
-            body: JSON.stringify({ nome: nome, quantidade: quantidade})
-        })
+        if(idEmEdicao !== null){
+            await fetch(url + "/" + idEmEdicao, {
+                method: "PATCH",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ nome: nome, quantidade: Number(quantidade) })
+            })
+
+            idEmEdicao = null
+            removerConteudo()
+            carregarProdutos()
+        } else {
+            fetch(url, {
+                method: "POST",
+                headers: { contentType: "application/json" },
+                body: JSON.stringify({ nome: nome, quantidade: quantidade})
+            })
+        }
     })
 
     containerPrincipal.appendChild(form)
@@ -104,6 +118,15 @@ function criarCards(resposta){
         const botaoEditar = document.createElement('button')
         botaoEditar.className = "botaoEditar"
         botaoEditar.textContent = "Editar"
+
+        botaoEditar.addEventListener('click', () => {
+            idEmEdicao = resposta[i].id
+            inputNome.value = resposta[i].nome
+            inputQuantidade.value = resposta[i].quantidade
+            tituloFormulario.textContent = "Editar Produto"
+            botaoCadastrar.textContent = "Salvar"
+            form.scrollIntoView({ behavior: "smooth" })
+        })
         
         botaoDeletar.className = "botaoDeletar"
         botaoDeletar.textContent = "Deletar"
